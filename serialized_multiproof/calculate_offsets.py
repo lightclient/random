@@ -1,4 +1,5 @@
 import unittest
+import hashlib
 
 # 4-bit
 #
@@ -22,23 +23,18 @@ import unittest
 #     / \   / \   / \   / \   / \   / \   / \   / \
 #    16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
 
-
 def prepare_indexes(indexes):
     raw_end_nodes = []
 
     # Convert index to list of bits
     for node in indexes:
-        raw_end_nodes.append([1 if x == '1' else 0 for x in "{:04b}".format(node)])
-
+        raw_end_nodes.append([1 if x == '1' else 0 for x in "{:05b}".format(node)])
+    
     # Normalize input (e.g. align the most significant bit of all indexes)
     for node in raw_end_nodes:
         while node[0] == 0:
             node.pop(0)
             node.append(1)
-
-    # Pop off most significant bit
-    for node in raw_end_nodes:
-        node.pop(0)
 
     return raw_end_nodes
 
@@ -90,6 +86,10 @@ class TestOffsetBuilder(unittest.TestCase):
     def test_5_bit_left_small_branch(self):
         nodes = prepare_indexes([16, 17, 9, 5, 3])
         self.assertEqual(build_offsets(nodes), [4, 3, 2, 1])
+
+    def test_5_bit_left_small_branch(self):
+        nodes = prepare_indexes([16, 17, 9, 10, 11, 3])
+        self.assertEqual(build_offsets(nodes), [5, 3, 2, 1, 1])
 
     def test_5_bit_right_small_branch(self):
         nodes = prepare_indexes([4, 10, 22, 23, 3])
